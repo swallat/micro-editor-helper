@@ -6,18 +6,18 @@ Helper to transistion from vim and nano to micro
 
 === Unix
 [source, bash]
-curl -sL https://gist.githubusercontent.com/swallat/466af7e64da969bc54d3d94d09843081/raw/install.sh | bash
+curl -sL https://raw.githubusercontent.com/swallat/micro-editor-helper/refs/heads/main/install.sh | bash
 
 === Windows
 [source, powershell]
-curl -sL https://gist.githubusercontent.com/swallat/466af7e64da969bc54d3d94d09843081/raw/install.sh | bash -s -- --uninstall
+Invoke-WebRequest -Uri https://raw.githubusercontent.com/swallat/micro-editor-helper/refs/heads/main/install.ps1 -OutFile install.ps1; .\install.ps1
 
 == Uninstallation
 
 === Unix
 [source, bash]
-Invoke-WebRequest -Uri https://gist.githubusercontent.com/swallat/466af7e64da969bc54d3d94d09843081/raw/install.ps1 -OutFile install.ps1; .\install.ps1
+curl -sL https://raw.githubusercontent.com/swallat/micro-editor-helper/refs/heads/main/install.sh | bash -s -- --uninstall
 
 === Windows
 [source, powershell]
-Invoke-WebRequest -Uri https://gist.githubusercontent.com/swallat/466af7e64da969bc54d3d94d09843081/raw/install.ps1 -OutFile install.ps1; .\install.ps1 --uninstall
+Invoke-WebRequest -Uri https://raw.githubusercontent.com/swallat/micro-editor-helper/refs/heads/main/install.ps1 -OutFile install.ps1; .\install.ps1 --uninstall
