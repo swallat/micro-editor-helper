@@ -25,12 +25,11 @@ function Uninstall-Scripts {
     Remove-Item -Force "$HOME\bin\editor-select.ps1" -ErrorAction SilentlyContinue
 
     # Entfernen der Aliase aus PowerShell Profilen
-    $profilePath = [System.IO.Path]::Combine($HOME, "Documents\WindowsPowerShell\Microsoft.PowerShell_profile.ps1")
+    $profilePath = $PROFILE
     if (Test-Path $profilePath) {
         (Get-Content $profilePath) -notmatch 'Set-Alias vim "$HOME\\bin\\editor-select.ps1"' | Set-Content $profilePath
         (Get-Content $profilePath) -notmatch 'Set-Alias nano "$HOME\\bin\\editor-select.ps1"' | Set-Content $profilePath
     }
-
     Write-Host "Uninstallation completed. Aliases and editor-select script removed."
     exit 0
 }
@@ -86,12 +85,13 @@ $editorSelectScriptPath = "$binPath\editor-select.ps1"
 $editorSelectScript | Out-File -FilePath $editorSelectScriptPath -Force
 
 # Add aliases to PowerShell profile
-$profilePath = [System.IO.Path]::Combine($HOME, "Documents\WindowsPowerShell\Microsoft.PowerShell_profile.ps1")
+$profilePath = $PROFILE
 if (-Not (Test-Path $profilePath)) {
     New-Item -ItemType File -Path $profilePath -Force
 }
 
 if (-Not (Get-Content $profilePath -ErrorAction SilentlyContinue | Select-String 'Set-Alias vim "$HOME\\bin\\editor-select.ps1"')) {
+    Add-Content $profilePath ''
     Add-Content $profilePath 'Set-Alias vim "$HOME\bin\editor-select.ps1"'
 }
 
