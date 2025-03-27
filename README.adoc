@@ -1,0 +1,23 @@
+= micro-editor-helper
+
+Helper to transistion from vim and nano to micro
+
+== Installation
+
+=== Unix
+[source, bash]
+curl -sL https://gist.githubusercontent.com/swallat/466af7e64da969bc54d3d94d09843081/raw/install.sh | bash
+
+=== Windows
+[source, powershell]
+curl -sL https://gist.githubusercontent.com/swallat/466af7e64da969bc54d3d94d09843081/raw/install.sh | bash -s -- --uninstall
+
+== Uninstallation
+
+=== Unix
+[source, bash]
+Invoke-WebRequest -Uri https://gist.githubusercontent.com/swallat/466af7e64da969bc54d3d94d09843081/raw/install.ps1 -OutFile install.ps1; .\install.ps1
+
+=== Windows
+[source, powershell]
+Invoke-WebRequest -Uri https://gist.githubusercontent.com/swallat/466af7e64da969bc54d3d94d09843081/raw/install.ps1 -OutFile install.ps1; .\install.ps1 --uninstall

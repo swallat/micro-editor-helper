@@ -1,0 +1,110 @@
+---
+- name: Install and configure editor-select
+  hosts: all
+  become: yes
+  tasks:
+    - name: Detect OS family
+      ansible.builtin.setup:
+      register: setup_output
+
+    - name: Install micro on Linux
+      ansible.builtin.package:
+        name: micro
+        state: present
+      when: ansible_facts['os_family'] != 'Windows'
+
+    - name: Create editor-select script on Linux
+      ansible.builtin.copy:
+        dest: /usr/local/bin/editor-select
+        content: |
+          #!/bin/bash
+          echo "Do you want to use vim, micro, or nano? (v/m/n) [Default: m]"
+          read -r editor_choice
+          editor_choice=${editor_choice:-m}
+          case "$editor_choice" in
+              v|V)
+                  vim "$@"
+                  ;;
+              m|M)
+                  micro "$@"
+                  ;;
+              n|N)
+                  nano "$@"
+                  ;;
+              *)
+                  echo "Invalid choice. Please choose 'v' for vim, 'm' for micro, or 'n' for nano."
+                  exit 1
+                  ;;
+          esac
+        mode: '0755'
+      when: ansible_facts['os_family'] != 'Windows'
+
+    - name: Add aliases to bash profile on Linux
+      ansible.builtin.lineinfile:
+        dest: ~/.bashrc
+        line: "alias vim='/usr/local/bin/editor-select'\\nalias nano='/usr/local/bin/editor-select'"
+        create: yes
+      when: ansible_facts['os_family'] != 'Windows'
+
+    - name: Add aliases to zsh profile on Linux
+      ansible.builtin.lineinfile:
+        dest: ~/.zshrc
+        line: "alias vim='/usr/local/bin/editor-select'\\nalias nano='/usr/local/bin/editor-select'"
+        create: yes
+      when: ansible_facts['os_family'] != 'Windows'
+
+    - name: Install Scoop on Windows
+      ansible.builtin.win_shell: |
+        if (-Not (Get-Command scoop -ErrorAction SilentlyContinue)) {
+            Invoke-Expression (New-Object System.Net.WebClient).DownloadString('https://get.scoop.sh')
+        }
+      when: ansible_facts['os_family'] == 'Windows'
+
+    - name: Install micro on Windows using Scoop
+      ansible.builtin.win_shell: |
+        scoop install micro
+      when: ansible_facts['os_family'] == 'Windows'
+
+    - name: Create editor-select script on Windows
+      ansible.builtin.win_copy:
+        dest: "{{ ansible_user_dir }}\\bin\\editor-select.ps1"
+        content: |
+          param (
+              [string[]]$args
+          )
+          Write-Host "Do you want to use vim, micro, or nano? (v/m/n) [Default: m]"
+          $editor_choice = Read-Host
+          if (-not $editor_choice) {
+              $editor_choice = 'm'
+          }
+          switch ($editor_choice) {
+              'v' {
+                  vim $args
+              }
+              'm' {
+                  micro $args
+              }
+              'n' {
+                  nano $args
+              }
+              default {
+                  Write-Host "Invalid choice. Please choose 'v' for vim, 'm' for micro, or 'n' for nano."
+                  exit 1
+              }
+          }
+        when: ansible_facts['os_family'] == 'Windows'
+
+    - name: Add aliases to PowerShell profile on Windows
+      ansible.builtin.win_shell: |
+        $profilePath = [System.IO.Path]::Combine($HOME, "Documents\\WindowsPowerShell\\Microsoft.PowerShell_profile.ps1")
+        if (-Not (Test-Path $profilePath)) {
+            New-Item -ItemType File -Path $profilePath -Force
+        }
+        if (-Not (Get-Content $profilePath -ErrorAction SilentlyContinue | Select-String 'Set-Alias vim "$HOME\\bin\\editor-select.ps1"')) {
+            Add-Content $profilePath 'Set-Alias vim "$HOME\\bin\\editor-select.ps1"'
+        }
+        if (-Not (Get-Content $profilePath -ErrorAction SilentlyContinue | Select-String 'Set-Alias nano "$HOME\\bin\\editor-select.ps1"')) {
+            Add-Content $profilePath 'Set-Alias nano "$HOME\\bin\\editor-select.ps1"'
+        }
+        . $profilePath
+      when: ansible_facts['os_family'] == 'Windows'
